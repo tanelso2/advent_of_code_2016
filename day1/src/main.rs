@@ -38,8 +38,14 @@ fn turn_right(dir: &Direction) -> Direction {
 
 fn main() -> std::io::Result<()> {
     let input = get_input()?;
-    part1(&input);
-    part2(&input);
+    assert_eq!(5, part1(&String::from("R2, L3")));
+    assert_eq!(2, part1(&String::from("R2, R2, R2")));
+    assert_eq!(12, part1(&String::from("R5, L5, R5, R3")));
+    let ret = part1(&input);
+    println!("The solution to part 1 is {}", ret);
+    assert_eq!(4, part2(&String::from("R8, R4, R4, R8")));
+    let ret2 = part2(&input);
+    println!("The solution to part 2 is {}", ret2);
     Ok(())
 }
 
@@ -47,16 +53,12 @@ fn part1(input: &String) -> i32 {
     let instructions = input.split(", ");
     let mut position = Position { x: 0, y: 0, current_direction: Direction::NORTH};
     let final_pos = instructions.fold(&mut position, |acc, x| do_instruction(acc, x.to_string()));
-    let ret = manhattan_distance(final_pos);
-    println!("The solution to part 1 is {}", ret);
-    ret
+    manhattan_distance(final_pos)
 }
 
 fn part2(input: &String) -> i32 {
     let position = get_first_revisted_location(input);
-    let ret = manhattan_distance(&position);
-    println!("The solution to part 2 is {}", ret);
-    ret
+    manhattan_distance(&position)
 }
 
 fn get_first_revisted_location(input: &String) -> Position {
@@ -75,9 +77,12 @@ fn get_first_revisted_location(input: &String) -> Position {
         for x in min_x..=max_x {
             for y in min_y..=max_y {
                 let location = (x, y);
+                if location == original_loc {
+                    // Original location is already in the set, so don't check it
+                    continue;
+                }
                 if visited_locations.contains(&location) {
-                    println!("Breaking on {:?}", current_loc);
-                    return position;
+                    return Position {x: location.0, y: location.1, ..position};
                 }
                 visited_locations.insert(location);
             }
